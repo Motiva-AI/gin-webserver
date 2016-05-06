@@ -11,6 +11,10 @@ import (
 
 var stoppedError = errors.New("Gin: Webserver is being stopped")
 
+type tcpKeepAliveListener struct {
+	*net.TCPListener
+}
+
 type stoppableListener struct {
 	tcpKeepAliveListener
 	stop chan int
@@ -57,10 +61,6 @@ func (server *WebServer) Stop() bool {
 	return true
 }
 
-type tcpKeepAliveListener struct {
-	*net.TCPListener
-}
-
 func (ln tcpKeepAliveListener) Accept() (c net.Conn, err error) {
 	tc, err := ln.AcceptTCP()
 	if err != nil {
@@ -99,8 +99,4 @@ func (sl *stoppableListener) Accept() (net.Conn, error) {
 		}
 		return newConn, err
 	}
-}
-
-func (sl *stoppableListener) Stop() {
-	close(sl.stop)
 }
