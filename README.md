@@ -19,4 +19,12 @@ If the server needs to be shut down use the stop method.
 
     server.Stop()
 
-A very simple example is provided to illustrate how it can be used. 
+A very simple example is provided to illustrate how it can be used.
+
+### Example
+
+To use the example just launch the example.go file from the example
+folder.
+
+    cd example
+    go run example.go

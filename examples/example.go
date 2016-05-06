@@ -1,14 +1,12 @@
 package main
 
 import (
-	"log"
-
+	"../../gin-webserver"
 	"github.com/gin-gonic/gin"
-	"github.com/glibs/gin-webserver"
 )
 
 func main() {
-	host := "127.0.0.1:81"
+	host := "0.0.0.0:80"
 	server := InitializeServer(host)
 	server.Start()
 	log.Println("Gin web server started on " + host)
@@ -20,7 +18,7 @@ func main() {
 }
 
 func InitializeServer(host string) (server *network.WebServer) {
-	//gin.SetMode(gin.ReleaseMode)
+	gin.SetMode(gin.ReleaseMode)
 	engine := gin.Default()
 	engine.LoadHTMLGlob("./templates/*")
 	engine.Static("/public/css/", "./public/css")
