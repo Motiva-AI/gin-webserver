@@ -11,54 +11,58 @@ import (
 
 var stoppedError = errors.New("Gin: Webserver is being stopped")
 
-type tcpKeepAliveListener struct {
-	*net.TCPListener
-}
-
 type stoppableListener struct {
 	tcpKeepAliveListener
 	stop chan int
 }
 
 type WebServer struct {
-	online   bool
-	host     string
+	Online   bool
+	Host     string
 	engine   *gin.Engine
 	listener *stoppableListener
 }
 
 func InitializeWebServer(r *gin.Engine, host string) (server *WebServer) {
 	return &WebServer{
-		online: false,
-		host:   host,
+		Online: false,
+		Host:   host,
 		engine: r,
 	}
 }
 
 func (wServer *WebServer) Start() error {
-	hServer := &http.Server{Addr: wServer.host, Handler: wServer.engine}
-	listener, err := net.Listen("tcp", wServer.host)
-	if err != nil {
-		return err
-	}
-	wServer.listener, err = newStoppableListener(tcpKeepAliveListener{listener.(*net.TCPListener)})
-	if err != nil {
-		return err
-	}
-	go hServer.Serve(wServer.listener)
-	wServer.online = true
-	if err != nil {
-		if err != stoppedError {
-			panic(err)
+	if !wServer.Online {
+		hServer := &http.Server{Addr: wServer.Host, Handler: wServer.engine}
+		listener, err := net.Listen("tcp", wServer.Host)
+		if err != nil {
+			return err
 		}
+		wServer.listener, err = newStoppableListener(tcpKeepAliveListener{listener.(*net.TCPListener)})
+		if err != nil {
+			return err
+		}
+		go hServer.Serve(wServer.listener)
+		wServer.Online = true
+		if err != nil {
+			if err != stoppedError {
+				panic(err)
+			}
+		}
+		return nil
+	} else {
+		return errors.New("Gin: Web server is already online")
 	}
-	return nil
 }
 
 func (server *WebServer) Stop() bool {
 	close(server.listener.stop)
-	server.online = false
+	server.Online = false
 	return true
+}
+
+type tcpKeepAliveListener struct {
+	*net.TCPListener
 }
 
 func (ln tcpKeepAliveListener) Accept() (c net.Conn, err error) {

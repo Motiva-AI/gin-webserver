@@ -3,10 +3,11 @@ package main
 import (
 	"../../gin-webserver"
 	"github.com/gin-gonic/gin"
+	"log"
 )
 
 func main() {
-	host := "0.0.0.0:80"
+	host := "0.0.0.0:8000"
 	server := InitializeServer(host)
 	server.Start()
 	log.Println("Gin web server started on " + host)
